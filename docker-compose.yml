@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   redis:
     image: redis:7-alpine
@@ -12,13 +14,12 @@ services:
     environment:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      TZ: TZ=Europe/Moscow
+      TZ: Europe/Berlin
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM:-}
-    # 👇 монтируем проект
     volumes:
       - ./:/app
     depends_on:
@@ -31,13 +32,12 @@ services:
     environment:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      TZ: TZ=Europe/Moscow
+      TZ: Europe/Berlin
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM:-}
-    # 👇 тоже монтируем проект
     volumes:
       - ./:/app
     depends_on:

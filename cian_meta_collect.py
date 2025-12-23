@@ -27,6 +27,7 @@ import requests
 
 # === Настройки по умолчанию ===
 URL = "https://api.cian.ru/search-offers-index/v2/get-meta/"
+# URL = "https://kazan.cian.ru/cian-api/site/v1/offers/search/meta/"
 REGION_ID = 4777  # Казань
 ENGINE_VERSION = 2
 BUILDING_STATUS = 1
@@ -34,14 +35,14 @@ PRICE_SM = True
 
 ROOMS = [1, 2, 3]
 PRICE_MIN = 140_000
-PRICE_MAX = 160_000
+PRICE_MAX = 220_000
 PRICE_STEP = 5_000
 
 CSV_PATH = "cian_counts.csv"
 REQUEST_TIMEOUT = 15  # сек
 RETRY_ATTEMPTS = 4
 RETRY_BASE_SLEEP = 1.2  # секунд
-USER_AGENT = "Mozilla/5.0 (compatible; CianMetaCollector/1.0; +https://example.local)"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 
 CSV_DELIMITER = ";"  # <--- требуемый разделитель
 
@@ -72,11 +73,16 @@ def build_payload(room: int, price_lte: int) -> Dict[str, Any]:
 
 
 def fetch_count(session: requests.Session, payload: Dict[str, Any]) -> Optional[int]:
+
+    cian_cookies(session)
+
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json, text/plain, */*",
-        "Origin": "https://www.cian.ru",
-        "Referer": "https://www.cian.ru/",
+        # "Origin": "https://www.cian.ru",
+        "Origin": "https://kazan.cian.ru",
+        # "Referer": "https://www.cian.ru/",
+        "Referer": "https://kazan.cian.ru",
         "User-Agent": USER_AGENT,
     }
 
@@ -166,5 +172,27 @@ def main():
     print(f"Готово. Строка добавлена в {out_path}")
 
 
+def cian_cookies(session):
+    data = [
+        {"name":"browser.microservice.frontend-mainpage.magazine.success","type":"counter"},
+        {"name":"browser.microservice.frontend-mainpage.seoContainer.hasSeoText","type":"counter"},
+        {"name":"browser.microservice.frontend-mainpage.seoContainer.hasSeoUrls","type":"counter"}
+    ]
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/plain, */*",
+        # "Origin": "https://www.cian.ru",
+        "Origin": "https://kazan.cian.ru",
+        # "Referer": "https://www.cian.ru/",
+        "Referer": "https://kazan.cian.ru",
+        "User-Agent": USER_AGENT,
+    }
+    url = "https://api.cian.ru/browser-telemetry/v1/send-stats/"
+    response = session.post(url, json=data)
+    cookies = response.cookies
+    return response
+
+
 if __name__ == "__main__":
+    # res = cian_cookies()
     main()
